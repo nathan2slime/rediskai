@@ -2,6 +2,13 @@ import { fireEvent, render, screen } from '@testing-library/react'
 
 import { BrowserView } from '@/components/redis-browser/browser-view'
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    refresh: vi.fn()
+  })
+}))
+
 vi.mock('@/components/redis-browser/key-list', () => ({
   KeyList: ({ onSelect, selectedKey }: { onSelect: (key: string) => void; selectedKey: string | null; onConnectionLost?: (message: string) => void }) => (
     <div>

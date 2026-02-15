@@ -1,7 +1,6 @@
-import type { SavedConnectionsProps } from '@/types/connection-manager'
-
 import { ConnectionCard } from '@/components/connection-manager/connection-card'
 import { EmptyConnections } from '@/components/connection-manager/empty-connections'
+import type { SavedConnectionsProps } from '@/types/connection-manager'
 
 /**
  * Render the list of saved connections.
