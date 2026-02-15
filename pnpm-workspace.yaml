@@ -1,0 +1,9 @@
+packages:
+  - '.'
+
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - esbuild
+  - lefthook
+  - sharp
+  - unrs-resolver
