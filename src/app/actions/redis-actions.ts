@@ -7,6 +7,10 @@ import { getConnectionsState } from '@/lib/connections-store'
 import type { RedisKeyDetailResult, RedisKeyInfo, RedisKeyUpdateResult, RedisScanResult } from '@/types/redis-browser'
 import { createRedisClient } from '@/utils/redis'
 
+const isConnectionError = (message: string) => {
+  return /ECONN|EHOSTUNREACH|ETIMEDOUT|ENOTFOUND|connect|Connection/i.test(message)
+}
+
 /**
  * Fetch a page of keys using SCAN and return metadata.
  */
@@ -39,6 +43,9 @@ export const scanKeys = async (_prevState: RedisScanResult | null, formData: For
     }
 
     return { cursor: nextCursor, items, done: nextCursor === '0' }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to scan keys'
+    return { cursor: '0', items: [], done: true, error: message, connectionLost: isConnectionError(message) }
   } finally {
     client.disconnect()
   }
@@ -118,7 +125,7 @@ export const fetchKeyDetail = async (_prevState: RedisKeyDetailResult | null, fo
     return { ok: true, key, type, ttl, value, valueText, highlightedHtml }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch key'
-    return { ok: false, key, error: message }
+    return { ok: false, key, error: message, connectionLost: isConnectionError(message) }
   } finally {
     client.disconnect()
   }
@@ -166,7 +173,7 @@ export const updateStringKey = async (_prevState: RedisKeyUpdateResult | null, f
     return { ok: true, key }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to update key'
-    return { ok: false, key, error: message }
+    return { ok: false, key, error: message, connectionLost: isConnectionError(message) }
   } finally {
     client.disconnect()
   }
@@ -193,7 +200,7 @@ export const deleteKey = async (_prevState: RedisKeyUpdateResult | null, formDat
     return { ok: true, key }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to delete key'
-    return { ok: false, key, error: message }
+    return { ok: false, key, error: message, connectionLost: isConnectionError(message) }
   } finally {
     client.disconnect()
   }

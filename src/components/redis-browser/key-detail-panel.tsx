@@ -1,7 +1,7 @@
 'use client'
 
 import { Check, Copy, FileSearch, Pencil, Save, Trash2 } from 'lucide-react'
-import { useActionState, useEffect, useMemo, useState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { toast } from 'sonner'
 
 import { deleteKey, fetchKeyDetail, updateStringKey } from '@/app/actions/redis-actions'
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { useKeyDetailState } from '@/hooks/use-key-detail-state'
 import type { RedisKeyDetailResult, RedisKeyUpdateResult } from '@/types/redis-browser'
 
 const initialResult: RedisKeyDetailResult = { ok: false, key: '', error: 'Select a key' }
@@ -22,6 +23,7 @@ const updateInitial: RedisKeyUpdateResult = { ok: true, key: '' }
  */
 export type KeyDetailPanelProps = {
   selectedKey: string | null
+  onConnectionLost?: (message: string) => void
 }
 
 /**
@@ -29,59 +31,40 @@ export type KeyDetailPanelProps = {
  * @example
  * <KeyDetailPanel selectedKey={key} />
  */
-export const KeyDetailPanel = ({ selectedKey }: KeyDetailPanelProps) => {
+export const KeyDetailPanel = ({ selectedKey, onConnectionLost }: KeyDetailPanelProps) => {
   const [detail, detailAction, detailPending] = useActionState(fetchKeyDetail, initialResult)
   const [updateState, updateAction, updatePending] = useActionState(updateStringKey, updateInitial)
   const [deleteState, deleteAction, deletePending] = useActionState(deleteKey, updateInitial)
-  const [copied, setCopied] = useState(false)
-  const [draftValue, setDraftValue] = useState('')
-  const [draftTtl, setDraftTtl] = useState('')
-
-  useEffect(() => {
-    if (!selectedKey) return
-    const formData = new FormData()
-    formData.set('key', selectedKey)
-    detailAction(formData)
-  }, [selectedKey, detailAction])
-
-  useEffect(() => {
-    if (detail.ok) {
-      setDraftValue(detail.valueText ?? '')
-      setDraftTtl(detail.ttl != null ? String(detail.ttl) : '')
+  const { copied, draftValue, draftTtl, canEditString, setDraftValue, setDraftTtl, handleCopy, handleDelete, handleRetry } = useKeyDetailState({
+    selectedKey,
+    detail,
+    updateState,
+    deleteState,
+    detailAction,
+    deleteAction,
+    notify: {
+      success: toast.success,
+      error: toast.error
     }
-  }, [detail])
+  })
 
   useEffect(() => {
-    if (!copied) return
-    const timer = setTimeout(() => setCopied(false), 1500)
-    return () => clearTimeout(timer)
-  }, [copied])
-
-  useEffect(() => {
-    if (updateState.ok && updateState.key) {
-      toast.success('Key updated.')
-    } else if (!updateState.ok && updateState.error) {
-      toast.error(updateState.error)
+    if (detail.connectionLost && detail.error) {
+      onConnectionLost?.(detail.error)
     }
-  }, [updateState])
+  }, [detail.connectionLost, detail.error, onConnectionLost])
 
   useEffect(() => {
-    if (deleteState.ok && deleteState.key) {
-      toast.success('Key deleted.')
-      setDraftValue('')
-      setDraftTtl('')
-    } else if (!deleteState.ok && deleteState.error) {
-      toast.error(deleteState.error)
+    if (updateState.connectionLost && updateState.error) {
+      onConnectionLost?.(updateState.error)
     }
-  }, [deleteState])
+  }, [updateState.connectionLost, updateState.error, onConnectionLost])
 
-  const handleCopy = async () => {
-    if (!detail.valueText) return
-    await navigator.clipboard.writeText(detail.valueText)
-    setCopied(true)
-  }
-
-  const canEditString = useMemo(() => detail.ok && detail.type === 'string', [detail])
+  useEffect(() => {
+    if (deleteState.connectionLost && deleteState.error) {
+      onConnectionLost?.(deleteState.error)
+    }
+  }, [deleteState.connectionLost, deleteState.error, onConnectionLost])
 
   return (
     <CardContent className="space-y-4 min-w-0">
@@ -132,16 +115,7 @@ export const KeyDetailPanel = ({ selectedKey }: KeyDetailPanelProps) => {
                             <Save className="size-4" />
                             {updatePending ? 'Saving...' : 'Save'}
                           </Button>
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            disabled={deletePending}
-                            onClick={() => {
-                              const formData = new FormData()
-                              formData.set('key', detail.key)
-                              deleteAction(formData)
-                            }}
-                          >
+                          <Button type="button" variant="destructive" disabled={deletePending} onClick={handleDelete}>
                             <Trash2 className="size-4" />
                             {deletePending ? 'Deleting...' : 'Delete'}
                           </Button>
@@ -169,18 +143,7 @@ export const KeyDetailPanel = ({ selectedKey }: KeyDetailPanelProps) => {
       ) : (
         <div className="space-y-2">
           <p className="text-sm text-destructive">{detail.error}</p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={!selectedKey}
-            onClick={() => {
-              if (!selectedKey) return
-              const formData = new FormData()
-              formData.set('key', selectedKey)
-              detailAction(formData)
-            }}
-          >
+          <Button type="button" variant="outline" size="sm" disabled={!selectedKey} onClick={handleRetry}>
             Retry
           </Button>
         </div>

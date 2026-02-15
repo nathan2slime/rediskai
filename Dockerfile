@@ -1,23 +1,26 @@
-# syntax=docker/dockerfile:1
-FROM node:20-alpine AS deps
+# syntax=docker/dockerfile:1.7
+ARG NODE_VERSION=20-alpine
+
+FROM node:${NODE_VERSION} AS base
 WORKDIR /app
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
+ENV NEXT_TELEMETRY_DISABLED=1
+
+FROM base AS deps
+COPY package.json pnpm-lock.yaml ./
 COPY scripts ./scripts
-RUN if [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable && pnpm i --frozen-lockfile; \
-  else npm i; fi
+RUN corepack enable && corepack prepare pnpm@10.29.3 --activate && pnpm install --no-frozen-lockfile
 
-FROM node:20-alpine AS builder
-WORKDIR /app
+FROM base AS builder
+ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
-COPY package.json ./
 COPY . .
-RUN npm run build
+RUN corepack enable && corepack prepare pnpm@10.29.3 --activate && pnpm run build
 
-FROM node:20-alpine AS runner
+FROM gcr.io/distroless/nodejs20-debian12 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Next standalone output
 COPY --from=builder /app/public ./public
@@ -25,4 +28,4 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/standalone ./
 
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["server.js"]

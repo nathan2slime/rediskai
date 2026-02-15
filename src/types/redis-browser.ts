@@ -24,6 +24,8 @@ export type RedisScanResult = {
   cursor: string
   items: RedisKeyInfo[]
   done: boolean
+  error?: string
+  connectionLost?: boolean
 }
 
 /**
@@ -62,6 +64,7 @@ export type RedisKeyDetailResult = {
   valueText?: string
   highlightedHtml?: string
   error?: string
+  connectionLost?: boolean
 }
 
 /**
@@ -76,6 +79,7 @@ export type RedisKeyUpdateResult = {
   ok: boolean
   key: string
   error?: string
+  connectionLost?: boolean
 }
 
 /**
@@ -90,6 +94,7 @@ export type KeyListProps = {
   activeConnectionId: string | null
   onSelect: (key: string) => void
   selectedKey: string | null
+  onConnectionLost?: (message: string) => void
 }
 
 /**
