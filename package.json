@@ -9,7 +9,6 @@
     "start": "next start",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "prepare": "node scripts/prepare.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
