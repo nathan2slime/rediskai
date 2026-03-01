@@ -1,14 +1,21 @@
 import type { Metadata } from 'next'
+import { Baloo_2 } from 'next/font/google'
 import type { PropsWithChildren } from 'react'
-import '@/app/globals.css'
 
 import { ThemeProvider } from '@/components/theme/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
+import '@/app/globals.css'
+
 export const metadata: Metadata = {
-  title: 'Redisoku Local',
+  title: 'Rediskai',
   description: 'Local Redis admin UI'
 }
+
+const base = Baloo_2({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700']
+})
 
 /**
  * Root layout wrapper.
@@ -18,7 +25,7 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: PropsWithChildren) => {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className={base.className}>
         <ThemeProvider>
           {children}
           <Toaster richColors closeButton />

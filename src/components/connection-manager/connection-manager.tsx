@@ -8,9 +8,9 @@ import { ConnectionForm } from '@/components/connection-manager/connection-form'
 import { ConnectionHeader } from '@/components/connection-manager/connection-header'
 import { SavedConnections } from '@/components/connection-manager/saved-connections'
 import { SavedConnectionsHeader } from '@/components/connection-manager/saved-connections-header'
-import { Card, CardContent } from '@/components/ui/card'
 import type { ConnectionManagerProps } from '@/types/connection-manager'
 import type { ActionResult } from '@/types/connections'
+import { Card } from '@gravity-ui/uikit'
 
 const initialResult: ActionResult = { ok: true }
 
@@ -38,7 +38,7 @@ export const ConnectionManager = ({ state }: ConnectionManagerProps) => {
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[auto_1fr]">
-        <Card className="h-fit">
+        <Card className="h-fit p-3 flex flex-col gap-2">
           <ConnectionHeader />
           <ConnectionForm addAction={addAction} addPending={addPending} addError={addState.error} />
         </Card>
@@ -46,7 +46,7 @@ export const ConnectionManager = ({ state }: ConnectionManagerProps) => {
 
       <Card>
         <SavedConnectionsHeader />
-        <CardContent className="space-y-4 mt-4">
+        <div className="space-y-4 mt-4">
           <SavedConnections
             state={state}
             pendingTestId={pendingTestId}
@@ -58,7 +58,7 @@ export const ConnectionManager = ({ state }: ConnectionManagerProps) => {
             openBrowserAction={openBrowser}
           />
           {renameState.ok ? null : <p className="text-sm text-destructive">{renameState.error}</p>}
-        </CardContent>
+        </div>
       </Card>
     </div>
   )

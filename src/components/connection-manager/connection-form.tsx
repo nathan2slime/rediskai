@@ -1,8 +1,6 @@
-import { Plus } from 'lucide-react'
+import { Plus } from '@gravity-ui/icons'
+import { Button, Icon, Text, TextInput } from '@gravity-ui/uikit'
 
-import { Button } from '@/components/ui/button'
-import { CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import type { ConnectionFormProps } from '@/types/connection-manager'
 
 /**
@@ -12,16 +10,22 @@ import type { ConnectionFormProps } from '@/types/connection-manager'
  */
 export const ConnectionForm = ({ addAction, addPending, addError }: ConnectionFormProps) => {
   return (
-    <CardContent className="space-y-4">
-      <form action={addAction} className="space-y-3">
-        <Input name="name" placeholder="Connection name" required />
-        <Input name="url" placeholder="redis://localhost:6379" required />
-        {addError ? <p className="text-sm text-destructive">{addError}</p> : null}
-        <Button type="submit" disabled={addPending} size="sm">
-          <Plus className="size-4" />
-          {addPending ? 'Saving...' : 'Add'}
+    <div className="space-y-4">
+      <form action={addAction} className="space-y-2">
+        <div className="space-y-1">
+          <TextInput name="name" placeholder="Connection name" />
+          <TextInput name="url" placeholder="redis://localhost:6379" />
+          {addError ? (
+            <Text className="text-xs" color="danger-heavy">
+              {addError}
+            </Text>
+          ) : null}
+        </div>
+        <Button loading={addPending} type="submit" view="action" size="m">
+          Add
+          <Icon data={Plus} size={15} />
         </Button>
       </form>
-    </CardContent>
+    </div>
   )
 }

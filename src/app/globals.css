@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@import "@gravity-ui/uikit/styles/fonts.css";
+@import "@gravity-ui/uikit/styles/styles.css";
+
+.g-root {
+  --g-font-family-sans: "Baloo 2", sans-serif;
+}
+
 :root {
   --background: oklch(0.9821 0 0);
   --foreground: oklch(0.2435 0 0);
