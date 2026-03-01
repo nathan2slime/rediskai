@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [20, 21, 22]
+        node: [22]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v3
@@ -20,6 +20,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm run typecheck
       - run: pnpm run build

@@ -2,8 +2,8 @@
 
 import { Moon, Sun } from '@gravity-ui/icons'
 import { Button, Icon } from '@gravity-ui/uikit'
-import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+
+import { useThemeToggle } from '@/hooks/use-theme-toggle'
 
 /**
  * Theme toggle button.
@@ -11,19 +11,12 @@ import { useEffect, useState } from 'react'
  * <ThemeToggle />
  */
 export const ThemeToggle = () => {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const { mounted, isDark, toggleTheme } = useThemeToggle()
 
   if (!mounted) return null
 
-  const isDark = theme === 'dark'
-
   return (
-    <Button type="button" variant="ghost" size="m" onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label="Toggle theme">
+    <Button type="button" variant="ghost" size="m" onClick={toggleTheme} aria-label="Toggle theme">
       {isDark ? <Icon data={Sun} /> : <Icon data={Moon} />}
     </Button>
   )

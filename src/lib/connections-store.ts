@@ -45,11 +45,7 @@ export const saveConnectionsState = async (state: ConnectionsState) => {
 /**
  * Create a new connection entry.
  */
-export const createConnection = (input: {
-  name: string
-  url: string
-  createdAt?: string
-}): Connection => {
+export const createConnection = (input: { name: string; url: string; createdAt?: string }): Connection => {
   const now = new Date().toISOString()
   return {
     id: crypto.randomUUID(),

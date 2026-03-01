@@ -1,13 +1,13 @@
 'use client'
 
 import { CheckCircle2, Database, Pencil, RefreshCw, Settings, Trash2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useConnectionCardState } from '@/hooks/use-connection-card-state'
 import { cn } from '@/lib/utils'
 import type { ConnectionCardProps } from '@/types/connection-manager'
 import { formatDateTime } from '@/utils/formatters'
@@ -29,19 +29,14 @@ export const ConnectionCard = ({
   activeDb,
   openBrowserAction
 }: ConnectionCardProps) => {
-  const [name, setName] = useState(connection.name)
-  const [selectedDb, setSelectedDb] = useState(String(activeDb))
-  const dbFormRef = useRef<HTMLFormElement>(null)
+  const { name, setName, selectedDb, dbFormRef, handleSelectedDbChange } = useConnectionCardState({
+    connectionName: connection.name,
+    activeDb,
+    isActive
+  })
 
-  useEffect(() => {
-    setName(connection.name)
-  }, [connection.name])
-
-  useEffect(() => {
-    if (isActive) {
-      setSelectedDb(String(activeDb))
-    }
-  }, [activeDb, isActive])
+  const renameFormId = `rename-${connection.id}`
+  const deleteFormId = `delete-${connection.id}`
 
   return (
     <div className={cn('rounded-lg border border-border bg-card p-4 shadow-sm', isActive ? 'border-emerald-400/60 bg-emerald-500/5 shadow-emerald-500/10' : '')}>
@@ -78,13 +73,7 @@ export const ConnectionCard = ({
         <form ref={dbFormRef} action={setDatabaseAction}>
           <input type="hidden" name="id" value={connection.id} />
           <input type="hidden" name="db" value={selectedDb} />
-          <Select
-            value={selectedDb}
-            onValueChange={value => {
-              setSelectedDb(value)
-              dbFormRef.current?.requestSubmit()
-            }}
-          >
+          <Select value={selectedDb} onValueChange={handleSelectedDbChange}>
             <SelectTrigger size="sm" className="w-[120px]">
               <SelectValue placeholder="DB" />
             </SelectTrigger>
@@ -100,7 +89,7 @@ export const ConnectionCard = ({
 
         <form action={openBrowserAction}>
           <input type="hidden" name="id" value={connection.id} />
-          <Button type="submit" variant="ghost" size="sm">
+          <Button type="submit" variant="ghost" size="sm" disabled={connection.lastTestStatus !== 'ok'}>
             <Database className="size-4" />
             Browser
           </Button>
@@ -123,25 +112,26 @@ export const ConnectionCard = ({
               <DialogDescription>Edit or delete this connection.</DialogDescription>
             </DialogHeader>
 
-            <form action={renameAction} className="space-y-3">
+            <form id={renameFormId} action={renameAction} className="space-y-3">
               <input type="hidden" name="id" value={connection.id} />
               <Input name="name" value={name} onChange={event => setName(event.target.value)} />
-              <DialogFooter>
-                <Button type="submit" variant="outline">
+            </form>
+
+            <form id={deleteFormId} action={deleteAction} className="hidden">
+              <input type="hidden" name="id" value={connection.id} />
+            </form>
+
+            <div className="border-t border-border pt-4">
+              <DialogFooter className="flex flex-wrap gap-2 sm:justify-end">
+                <Button type="submit" variant="destructive" form={deleteFormId}>
+                  <Trash2 className="size-4" />
+                  Delete
+                </Button>
+                <Button type="submit" variant="outline" form={renameFormId}>
                   <Pencil className="size-4" />
                   Rename
                 </Button>
               </DialogFooter>
-            </form>
-
-            <div className="border-t border-border pt-4">
-              <form action={deleteAction}>
-                <input type="hidden" name="id" value={connection.id} />
-                <Button type="submit" variant="destructive">
-                  <Trash2 className="size-4" />
-                  Delete connection
-                </Button>
-              </form>
             </div>
           </DialogContent>
         </Dialog>

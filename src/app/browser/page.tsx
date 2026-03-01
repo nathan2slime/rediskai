@@ -2,19 +2,27 @@ import { Button } from '@gravity-ui/uikit'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
+import { Logo } from '@/components/brand/logo'
 import { AppShell } from '@/components/layout/app-shell'
 import { BrowserView } from '@/components/redis-browser'
+import { ConnectionLostDialog } from '@/components/redis-browser/connection-lost-dialog'
 import { getConnectionsState } from '@/lib/connections-store'
 
 const BrowserPage = async () => {
   const state = await getConnectionsState()
   const active = state.connections.find(connection => connection.id === state.activeId)
 
+  const isStable = Boolean(active && active.lastTestStatus === 'ok')
+
   return (
     <AppShell>
       <div className="space-y-6">
         <header className="flex flex-wrap items-center justify-between gap-4 pb-4">
           <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Logo className="size-5" />
+              <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Rediskai</span>
+            </div>
             <Link href="/connections">
               <Button variant="ghost" size="m">
                 <ArrowLeft className="size-4" />
@@ -34,7 +42,22 @@ const BrowserPage = async () => {
             </div>
           </div>
         </header>
-        <BrowserView activeConnectionId={state.activeId} />
+        {isStable ? (
+          <BrowserView activeConnectionId={state.activeId} />
+        ) : (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
+            <p className="font-semibold">Connection unavailable</p>
+            <p>Run a connection test from the home screen before opening the browser.</p>
+            <div className="mt-4">
+              <Link href="/">
+                <Button type="button" variant="outline">
+                  Back to home
+                </Button>
+              </Link>
+            </div>
+            <ConnectionLostDialog open title="Connection unavailable" description="The Redis connection is not stable. Returning to the home screen." />
+          </div>
+        )}
       </div>
     </AppShell>
   )
