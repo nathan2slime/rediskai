@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/components/theme/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
 export const metadata: Metadata = {
-  title: 'Redisoku Local',
+  title: 'Rediskai',
   description: 'Local Redis admin UI'
 }
 

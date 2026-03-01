@@ -1,14 +1,15 @@
 'use client'
 
 import { ArrowDown, Eye, Search } from 'lucide-react'
-import { useActionState, useEffect, useState } from 'react'
+import { useActionState, useEffect } from 'react'
 
 import { scanKeys } from '@/app/actions/redis-actions'
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { useKeyListState } from '@/hooks/use-key-list-state'
 import { cn } from '@/lib/utils'
-import type { KeyListProps, RedisKeyInfo, RedisScanResult } from '@/types/redis-browser'
+import type { KeyListProps, RedisScanResult } from '@/types/redis-browser'
 
 const initialResult: RedisScanResult = { cursor: '0', items: [], done: true }
 
@@ -17,44 +18,19 @@ const initialResult: RedisScanResult = { cursor: '0', items: [], done: true }
  * @example
  * <KeyList activeConnectionId={state.activeId} onSelect={setKey} selectedKey={key} />
  */
-export const KeyList = ({ activeConnectionId, onSelect, selectedKey }: KeyListProps) => {
+export const KeyList = ({ activeConnectionId, onSelect, selectedKey, onConnectionLost }: KeyListProps) => {
   const [scanState, scanAction, scanPending] = useActionState(scanKeys, initialResult)
-  const [pattern, setPattern] = useState('*')
-  const [cursor, setCursor] = useState('0')
-  const [mode, setMode] = useState<'search' | 'more'>('search')
-  const [items, setItems] = useState<RedisKeyInfo[]>([])
+  const { pattern, setPattern, items, cursor, handleSearch, handleLoadMore } = useKeyListState({
+    activeConnectionId,
+    scanState,
+    scanAction
+  })
 
   useEffect(() => {
-    if (mode === 'search') {
-      setItems(scanState.items)
-    } else {
-      setItems(prev => [...prev, ...scanState.items])
+    if (scanState.connectionLost && scanState.error) {
+      onConnectionLost?.(scanState.error)
     }
-    setCursor(scanState.cursor)
-  }, [mode, scanState.items, scanState.cursor])
-
-  useEffect(() => {
-    setItems([])
-    setCursor('0')
-    setMode('search')
-  }, [activeConnectionId])
-
-  const handleSearch = (formData: FormData) => {
-    formData.set('cursor', '0')
-    formData.set('pattern', pattern)
-    formData.set('count', '100')
-    setMode('search')
-    setCursor('0')
-    scanAction(formData)
-  }
-
-  const handleLoadMore = (formData: FormData) => {
-    formData.set('cursor', cursor)
-    formData.set('pattern', pattern)
-    formData.set('count', '100')
-    setMode('more')
-    scanAction(formData)
-  }
+  }, [scanState.connectionLost, scanState.error, onConnectionLost])
 
   return (
     <CardContent className="space-y-4">
@@ -66,7 +42,9 @@ export const KeyList = ({ activeConnectionId, onSelect, selectedKey }: KeyListPr
         </Button>
       </form>
 
-      {!activeConnectionId ? (
+      {scanState.error ? (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">{scanState.error}</div>
+      ) : !activeConnectionId ? (
         <div className="rounded-md border border-border bg-card p-4 text-sm text-muted-foreground">Select an active connection to browse keys.</div>
       ) : (
         <div className="rounded-md border border-border bg-card">
@@ -96,7 +74,7 @@ export const KeyList = ({ activeConnectionId, onSelect, selectedKey }: KeyListPr
       )}
 
       <form action={handleLoadMore}>
-        <input type="hidden" name="cursor" value={scanState.cursor} />
+        <input type="hidden" name="cursor" value={cursor} />
         <input type="hidden" name="pattern" value={pattern} />
         <input type="hidden" name="count" value="100" />
         <Button type="submit" variant="outline" disabled={scanPending || scanState.done || !activeConnectionId}>

@@ -1,14 +1,15 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState } from 'react'
 import { toast } from 'sonner'
 
-import { addConnection, deleteConnection, openBrowser, renameConnection, setActiveConnection, setActiveDatabase, testConnection } from '@/app/actions/connection-actions'
+import { addConnection, deleteConnection, openBrowser, renameConnection, setActiveConnection, setActiveDatabase } from '@/app/actions/connection-actions'
 import { ConnectionForm } from '@/components/connection-manager/connection-form'
 import { ConnectionHeader } from '@/components/connection-manager/connection-header'
 import { SavedConnections } from '@/components/connection-manager/saved-connections'
 import { SavedConnectionsHeader } from '@/components/connection-manager/saved-connections-header'
 import { Card, CardContent } from '@/components/ui/card'
+import { useConnectionTestAction } from '@/hooks/use-connection-test-action'
 import type { ConnectionManagerProps } from '@/types/connection-manager'
 import type { ActionResult } from '@/types/connections'
 
@@ -22,18 +23,11 @@ const initialResult: ActionResult = { ok: true }
 export const ConnectionManager = ({ state }: ConnectionManagerProps) => {
   const [addState, addAction, addPending] = useActionState(addConnection, initialResult)
   const [renameState, renameAction] = useActionState(renameConnection, initialResult)
-  const [pendingTestId, setPendingTestId] = useState<string | null>(null)
-
-  const handleTest = async (id: string) => {
-    setPendingTestId(id)
-    const formData = new FormData()
-    formData.set('id', id)
-    const result = await testConnection(initialResult, formData)
-    if (!result.ok) {
-      toast.error('Connection is closed.')
+  const { pendingTestId, handleTest } = useConnectionTestAction({
+    notify: {
+      error: toast.error
     }
-    setPendingTestId(null)
-  }
+  })
 
   return (
     <div className="space-y-6">
