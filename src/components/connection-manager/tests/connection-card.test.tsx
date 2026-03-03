@@ -11,7 +11,8 @@ describe('ConnectionCard', () => {
     id: 'conn-1',
     name: 'Local',
     url: 'redis://localhost:6379',
-    lastTestStatus: 'ok',
+    createdAt: '2024-01-01T00:00:00.000Z',
+    lastTestStatus: 'ok' as const,
     lastTestedAt: '2024-01-01T00:00:00.000Z',
     lastTestLatencyMs: 12,
     lastTestError: undefined
