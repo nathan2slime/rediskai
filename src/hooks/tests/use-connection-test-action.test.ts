@@ -39,7 +39,7 @@ describe('useConnectionTestAction', () => {
       await result.current.handleTest('conn-2')
     })
 
-    expect(error).toHaveBeenCalledWith('Connection is closed.')
+    expect(error).toHaveBeenCalledWith('Connection is closed')
     expect(result.current.pendingTestId).toBeNull()
   })
 })

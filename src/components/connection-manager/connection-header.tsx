@@ -8,7 +8,7 @@ import { Text } from '@gravity-ui/uikit'
 export const ConnectionHeader = () => {
   return (
     <div className="flex flex-col">
-      <Text variant="header-1">New connection</Text>
+      <Text variant="body-3">New connection</Text>
       <Text variant="body-1">Save Redis URLs to switch quickly</Text>
     </div>
   )

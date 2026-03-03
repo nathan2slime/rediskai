@@ -1,8 +1,9 @@
 'use client'
 
-import { Plus } from '@gravity-ui/icons'
-import { Button, Icon, Text, TextInput } from '@gravity-ui/uikit'
+import { FloppyDisk, Xmark } from '@gravity-ui/icons'
+import { Button, Icon, TextInput } from '@gravity-ui/uikit'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useRef, useTransition } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -10,7 +11,7 @@ import type { ConnectionFormProps } from '@/types/connection-manager'
 
 const connectionSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
-  url: z.string().trim().min(1, 'URL is required')
+  url: z.string().url().trim().min(1, 'URL is required')
 })
 
 type ConnectionFormValues = z.infer<typeof connectionSchema>
@@ -20,7 +21,7 @@ type ConnectionFormValues = z.infer<typeof connectionSchema>
  * @example
  * <ConnectionForm addAction={action} addPending={false} />
  */
-export const ConnectionForm = ({ addAction, addPending, addError }: ConnectionFormProps) => {
+export const ConnectionForm = ({ addAction, closeAction, addPending, addState }: ConnectionFormProps) => {
   const {
     control,
     handleSubmit,
@@ -28,26 +29,41 @@ export const ConnectionForm = ({ addAction, addPending, addError }: ConnectionFo
     formState: { errors, isSubmitting }
   } = useForm<ConnectionFormValues>({
     resolver: zodResolver(connectionSchema),
+    mode: 'all',
     defaultValues: {
       name: '',
       url: ''
     }
   })
+  const [isTransitionPending, startTransition] = useTransition()
+  const submittedRef = useRef(false)
 
   const handleAdd = handleSubmit(async values => {
     const formData = new FormData()
     formData.set('name', values.name)
     formData.set('url', values.url)
 
-    await addAction(formData)
-    reset()
+    submittedRef.current = true
+    startTransition(() => {
+      addAction(formData)
+      closeAction()
+    })
   })
 
-  const isBusy = addPending || isSubmitting
+  useEffect(() => {
+    if (!submittedRef.current) return
+    if (addPending || isTransitionPending) return
+    if (addState.ok) {
+      reset()
+    }
+    submittedRef.current = false
+  }, [addPending, addState.ok, isTransitionPending, reset])
+
+  const isBusy = addPending || isSubmitting || isTransitionPending
 
   return (
     <div className="space-y-4">
-      <form className="space-y-2" onSubmit={handleAdd}>
+      <form className="flex flex-col space-y-2 justify-between items-end" onSubmit={handleAdd}>
         <div className="space-y-1">
           <Controller
             control={control}
@@ -87,16 +103,19 @@ export const ConnectionForm = ({ addAction, addPending, addError }: ConnectionFo
               )
             }}
           />
-          {addError ? (
-            <Text className="text-xs" color="danger-heavy">
-              {addError}
-            </Text>
-          ) : null}
         </div>
-        <Button loading={isBusy} type="submit" view="action" size="m">
-          Add
-          <Icon data={Plus} size={15} />
-        </Button>
+
+        <div className="w-full justify-end items-end gap-2 flex">
+          <Button onClick={closeAction}>
+            <Icon data={Xmark} size={15} />
+            Cancel
+          </Button>
+
+          <Button loading={isBusy} type="submit" view="action" size="m">
+            <Icon data={FloppyDisk} size={15} />
+            Confirm
+          </Button>
+        </div>
       </form>
     </div>
   )

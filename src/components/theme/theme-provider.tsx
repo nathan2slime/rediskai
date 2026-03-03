@@ -11,7 +11,7 @@ import type { PropsWithChildren } from 'react'
  */
 export const ThemeProvider = ({ children }: PropsWithChildren) => {
   return (
-    <GravityProvider theme="dark">
+    <GravityProvider theme="light">
       <NextThemesProvider attribute="class" defaultTheme="light" enableSystem>
         {children}
       </NextThemesProvider>

@@ -1,7 +1,8 @@
 'use client'
 
-import { Card } from '@gravity-ui/uikit'
-import { useActionState } from 'react'
+import { Xmark } from '@gravity-ui/icons'
+import { Button, Card, Divider, Icon, Modal } from '@gravity-ui/uikit'
+import { useActionState, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { addConnection, deleteConnection, openBrowser, renameConnection, setActiveConnection, setActiveDatabase } from '@/app/actions/connection-actions'
@@ -15,12 +16,21 @@ import type { ActionResult } from '@/types/connections'
 
 const initialResult: ActionResult = { ok: true }
 
+const useActionErrorToast = (state: ActionResult) => {
+  useEffect(() => {
+    if (state.ok) return
+    if (!state.error) return
+    toast.error(state.error)
+  }, [state.error, state.ok])
+}
+
 /**
  * Manage saved Redis connections.
  * @example
  * <ConnectionManager state={state} />
  */
 export const ConnectionManager = ({ state }: ConnectionManagerProps) => {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [addState, addAction, addPending] = useActionState(addConnection, initialResult)
   const [renameState, renameAction] = useActionState(renameConnection, initialResult)
   const { pendingTestId, handleTest } = useConnectionTestAction({
@@ -29,17 +39,27 @@ export const ConnectionManager = ({ state }: ConnectionManagerProps) => {
     }
   })
 
-  return (
-    <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[auto_1fr]">
-        <Card className="h-fit p-3 flex flex-col gap-2">
-          <ConnectionHeader />
-          <ConnectionForm addAction={addAction} addPending={addPending} addError={addState.error} />
-        </Card>
-      </div>
+  useActionErrorToast(addState)
+  useActionErrorToast(renameState)
 
-      <Card>
-        <SavedConnectionsHeader />
+  const renderAddConnectionCard = () => (
+    <div className="h-fit flex flex-col gap-2">
+      <div className="flex items-start justify-between gap-3">
+        <ConnectionHeader />
+        <Button type="button" view="flat" size="s" onClick={() => setIsAddModalOpen(false)}>
+          <Icon data={Xmark} size={14} />
+        </Button>
+      </div>
+      <Divider className="mb-2" />
+      <ConnectionForm closeAction={() => setIsAddModalOpen(false)} addAction={addAction} addPending={addPending} addState={addState} />
+    </div>
+  )
+
+  return (
+    <div className="space-y-6 relative">
+      <Card className="p-3">
+        <SavedConnectionsHeader setIsAddModalOpen={setIsAddModalOpen} />
+        <Divider className="my-2" />
         <div className="space-y-4 mt-4">
           <SavedConnections
             state={state}
@@ -51,9 +71,12 @@ export const ConnectionManager = ({ state }: ConnectionManagerProps) => {
             deleteAction={deleteConnection}
             openBrowserAction={openBrowser}
           />
-          {renameState.ok ? null : <p className="text-sm text-destructive">{renameState.error}</p>}
         </div>
       </Card>
+
+      <Modal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} contentClassName="p-4 w-[min(520px,92vw)]">
+        {renderAddConnectionCard()}
+      </Modal>
     </div>
   )
 }
