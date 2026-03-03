@@ -14,14 +14,15 @@ export type ConnectionManagerProps = {
  * Props for the ConnectionForm component.
  * @property {(formData: FormData) => void} addAction - Server action handler for adding connections.
  * @property {boolean} addPending - Indicates whether the add action is pending.
- * @property {string} [addError] - Optional error message from the add action.
+ * @property {import('@/types/connections').ActionResult} addState - Result state for add action.
  * @example
  * <ConnectionForm addAction={action} addPending={false} />
  */
 export type ConnectionFormProps = {
   addAction: (formData: FormData) => void
   addPending: boolean
-  addError?: string
+  addState: import('@/types/connections').ActionResult
+  closeAction: VoidFunction
 }
 
 /**

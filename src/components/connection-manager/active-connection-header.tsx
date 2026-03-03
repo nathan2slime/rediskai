@@ -1,4 +1,4 @@
-import { CardDescription, CardTitle } from '@/components/ui/card'
+import { Text } from '@gravity-ui/uikit'
 
 /**
  * Title and subtitle for the active connection panel.
@@ -8,8 +8,12 @@ import { CardDescription, CardTitle } from '@/components/ui/card'
 export const ActiveConnectionHeader = () => {
   return (
     <div className="space-y-2">
-      <CardTitle>Active connection</CardTitle>
-      <CardDescription>Pick a database index for the active connection.</CardDescription>
+      <Text as="h3" variant="header-1">
+        Active connection
+      </Text>
+      <Text as="p" className="text-sm text-muted-foreground">
+        Pick a database index for the active connection.
+      </Text>
     </div>
   )
 }

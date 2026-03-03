@@ -1,4 +1,4 @@
-import { CardHeader, CardTitle } from '@/components/ui/card'
+import { Text } from '@gravity-ui/uikit'
 
 /**
  * Title and subtitle for the create connection card.
@@ -7,9 +7,9 @@ import { CardHeader, CardTitle } from '@/components/ui/card'
  */
 export const ConnectionHeader = () => {
   return (
-    <CardHeader>
-      <CardTitle>New connection</CardTitle>
-      <p className="text-sm text-muted-foreground">Save Redis URLs to switch quickly.</p>
-    </CardHeader>
+    <div className="flex flex-col">
+      <Text variant="body-3">New connection</Text>
+      <Text variant="body-1">Save Redis URLs to switch quickly</Text>
+    </div>
   )
 }

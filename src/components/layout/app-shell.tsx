@@ -14,5 +14,5 @@ export type AppShellProps = PropsWithChildren
  * <AppShell><div /></AppShell>
  */
 export const AppShell = ({ children }: AppShellProps) => {
-  return <main className="mx-auto min-h-screen w-full max-w-6xl px-page py-8">{children}</main>
+  return <main className="mx-auto min-h-screen w-full max-w-6xl px-page p-8">{children}</main>
 }

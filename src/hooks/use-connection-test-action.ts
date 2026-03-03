@@ -23,7 +23,7 @@ export const useConnectionTestAction = ({ notify }: UseConnectionTestActionParam
       formData.set('id', id)
       const result = await testConnection(initialResult, formData)
       if (!result.ok) {
-        notify.error('Connection is closed.')
+        notify.error('Connection is closed')
       }
       setPendingTestId(null)
     },

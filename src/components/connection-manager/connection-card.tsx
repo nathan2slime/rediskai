@@ -1,14 +1,11 @@
 'use client'
 
-import { CheckCircle2, Database, Pencil, RefreshCw, Settings, Trash2 } from 'lucide-react'
+import { CheckDouble, Database, Pencil, PlugConnection } from '@gravity-ui/icons'
+import { Button, Card, Icon, Label, Select } from '@gravity-ui/uikit'
+import { useMemo, useState } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ConnectionSettingsModal } from '@/components/connection-manager/connection-settings-modal'
 import { useConnectionCardState } from '@/hooks/use-connection-card-state'
-import { cn } from '@/lib/utils'
 import type { ConnectionCardProps } from '@/types/connection-manager'
 import { formatDateTime } from '@/utils/formatters'
 
@@ -29,28 +26,39 @@ export const ConnectionCard = ({
   activeDb,
   openBrowserAction
 }: ConnectionCardProps) => {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const { name, setName, selectedDb, dbFormRef, handleSelectedDbChange } = useConnectionCardState({
     connectionName: connection.name,
     activeDb,
     isActive
   })
 
-  const renameFormId = `rename-${connection.id}`
-  const deleteFormId = `delete-${connection.id}`
+  const dbOptions = useMemo(
+    () =>
+      Array.from({ length: 14 }).map((_, index) => ({
+        value: String(index),
+        content: `DB ${index}`
+      })),
+    []
+  )
 
   return (
-    <div className={cn('rounded-lg border border-border bg-card p-4 shadow-sm', isActive ? 'border-emerald-400/60 bg-emerald-500/5 shadow-emerald-500/10' : '')}>
+    <Card theme={isActive ? 'success' : 'normal'} className="p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-foreground">{connection.name}</p>
           <p className="text-xs text-muted-foreground break-all">{connection.url}</p>
         </div>
         <div className="flex items-center gap-2">
-          {isActive ? <Badge className="border-emerald-300/40 bg-emerald-500/10 text-emerald-400">active</Badge> : null}
+          {isActive ? (
+            <Label theme="success" size="xs">
+              active
+            </Label>
+          ) : null}
           {connection.lastTestStatus ? (
-            <Badge className={connection.lastTestStatus === 'ok' ? 'border-emerald-300/40 bg-emerald-500/10 text-emerald-400' : 'border-red-300/40 bg-red-500/10 text-red-400'}>
+            <Label theme={connection.lastTestStatus === 'ok' ? 'success' : 'danger'} size="xs">
               {connection.lastTestStatus}
-            </Badge>
+            </Label>
           ) : null}
         </div>
       </div>
@@ -64,8 +72,8 @@ export const ConnectionCard = ({
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <form action={setActiveAction}>
           <input type="hidden" name="id" value={connection.id} />
-          <Button type="submit" variant="outline" size="sm" disabled={isActive}>
-            <CheckCircle2 className="size-4" />
+          <Button type="submit" view="outlined" size="s" disabled={isActive}>
+            <Icon data={CheckDouble} />
             {isActive ? 'Active' : 'Activate'}
           </Button>
         </form>
@@ -73,69 +81,36 @@ export const ConnectionCard = ({
         <form ref={dbFormRef} action={setDatabaseAction}>
           <input type="hidden" name="id" value={connection.id} />
           <input type="hidden" name="db" value={selectedDb} />
-          <Select value={selectedDb} onValueChange={handleSelectedDbChange}>
-            <SelectTrigger size="sm" className="w-[120px]">
-              <SelectValue placeholder="DB" />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 16 }).map((_, index) => (
-                <SelectItem key={index} value={String(index)}>
-                  DB {index}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Select size="s" width={120} value={[selectedDb]} onUpdate={value => handleSelectedDbChange(value[0] ?? '0')} options={dbOptions} placeholder="DB" />
         </form>
 
         <form action={openBrowserAction}>
           <input type="hidden" name="id" value={connection.id} />
-          <Button type="submit" variant="ghost" size="sm" disabled={connection.lastTestStatus !== 'ok'}>
-            <Database className="size-4" />
+          <Button type="submit" view="flat" size="s" disabled={connection.lastTestStatus !== 'ok'}>
+            <Icon data={Database} />
             Browser
           </Button>
         </form>
 
-        <Button type="button" variant="ghost" size="sm" disabled={testPending} onClick={() => testAction(connection.id)}>
-          <RefreshCw className={testPending ? 'size-4 animate-spin' : 'size-4'} />
-          {testPending ? 'Testing...' : 'Test'}
+        <Button type="button" loading={testPending} view="flat" size="s" disabled={testPending} onClick={() => testAction(connection.id)}>
+          <Icon data={PlugConnection} />
+          Test
         </Button>
 
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button type="button" variant="ghost" size="icon">
-              <Settings className="size-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Connection settings</DialogTitle>
-              <DialogDescription>Edit or delete this connection.</DialogDescription>
-            </DialogHeader>
+        <Button type="button" view="flat" size="s" onClick={() => setIsSettingsOpen(true)}>
+          <Icon data={Pencil} />
+        </Button>
 
-            <form id={renameFormId} action={renameAction} className="space-y-3">
-              <input type="hidden" name="id" value={connection.id} />
-              <Input name="name" value={name} onChange={event => setName(event.target.value)} />
-            </form>
-
-            <form id={deleteFormId} action={deleteAction} className="hidden">
-              <input type="hidden" name="id" value={connection.id} />
-            </form>
-
-            <div className="border-t border-border pt-4">
-              <DialogFooter className="flex flex-wrap gap-2 sm:justify-end">
-                <Button type="submit" variant="destructive" form={deleteFormId}>
-                  <Trash2 className="size-4" />
-                  Delete
-                </Button>
-                <Button type="submit" variant="outline" form={renameFormId}>
-                  <Pencil className="size-4" />
-                  Rename
-                </Button>
-              </DialogFooter>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <ConnectionSettingsModal
+          isOpen={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          connectionId={connection.id}
+          name={name}
+          onNameChange={setName}
+          renameAction={renameAction}
+          deleteAction={deleteAction}
+        />
       </div>
-    </div>
+    </Card>
   )
 }

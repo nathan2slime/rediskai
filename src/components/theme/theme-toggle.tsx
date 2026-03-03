@@ -1,8 +1,8 @@
 'use client'
 
-import { Moon, Sun } from 'lucide-react'
+import { Moon, Sun } from '@gravity-ui/icons'
+import { Button, Card, Icon } from '@gravity-ui/uikit'
 
-import { Button } from '@/components/ui/button'
 import { useThemeToggle } from '@/hooks/use-theme-toggle'
 
 /**
@@ -16,8 +16,10 @@ export const ThemeToggle = () => {
   if (!mounted) return null
 
   return (
-    <Button type="button" variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
-      {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
-    </Button>
+    <Card className="items-center hidden justify-between mb-4 p-3">
+      <Button type="button" variant="ghost" size="m" onClick={toggleTheme} aria-label="Toggle theme">
+        {isDark ? <Icon data={Sun} /> : <Icon data={Moon} />}
+      </Button>
+    </Card>
   )
 }

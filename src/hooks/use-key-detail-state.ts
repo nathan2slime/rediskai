@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 
 import type { RedisKeyDetailResult, RedisKeyUpdateResult } from '@/types/redis-browser'
 
@@ -41,10 +41,13 @@ export const useKeyDetailState = ({
   const [copied, setCopied] = useState(false)
   const [draftValue, setDraftValue] = useState('')
   const [draftTtl, setDraftTtl] = useState('')
+  const [, startTransition] = useTransition()
 
   useEffect(() => {
     if (!selectedKey) return
-    detailAction(buildSingleKeyFormData(selectedKey))
+    startTransition(() => {
+      detailAction(buildSingleKeyFormData(selectedKey))
+    })
   }, [selectedKey, detailAction])
 
   useEffect(() => {
@@ -52,7 +55,7 @@ export const useKeyDetailState = ({
       setDraftValue(detail.valueText ?? '')
       setDraftTtl(detail.ttl != null ? String(detail.ttl) : '')
     }
-  }, [detail])
+  }, [detail.ok, detail.valueText, detail.ttl])
 
   useEffect(() => {
     if (!copied) return
@@ -86,12 +89,16 @@ export const useKeyDetailState = ({
 
   const handleDelete = useCallback(() => {
     if (!detail.key) return
-    deleteAction(buildSingleKeyFormData(detail.key))
+    startTransition(() => {
+      deleteAction(buildSingleKeyFormData(detail.key))
+    })
   }, [deleteAction, detail.key])
 
   const handleRetry = useCallback(() => {
     if (!selectedKey) return
-    detailAction(buildSingleKeyFormData(selectedKey))
+    startTransition(() => {
+      detailAction(buildSingleKeyFormData(selectedKey))
+    })
   }, [detailAction, selectedKey])
 
   const canEditString = useMemo(() => detail.ok && detail.type === 'string', [detail.ok, detail.type])

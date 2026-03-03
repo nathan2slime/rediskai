@@ -2,8 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button, Divider, Modal, Text } from '@gravity-ui/uikit'
 
 export type ConnectionLostDialogProps = {
   open: boolean
@@ -21,18 +20,27 @@ export const ConnectionLostDialog = ({ open, title, description, redirectTo = '/
   }
 
   return (
-    <Dialog open={open}>
-      <DialogContent>
-        <DialogHeader>
-          {title ? <DialogTitle>{title}</DialogTitle> : null}
-          {description ? <DialogDescription>{description}</DialogDescription> : null}
-        </DialogHeader>
-        <DialogFooter>
-          <Button type="button" onClick={handleBack}>
+    <Modal open={open} onOpenChange={() => null} contentClassName="p-4 w-[min(520px,92vw)]!">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          {title ? (
+            <Text as="h3" variant="header-1">
+              {title}
+            </Text>
+          ) : null}
+          {description ? (
+            <Text as="p" className="text-sm text-muted-foreground">
+              {description}
+            </Text>
+          ) : null}
+        </div>
+        <Divider />
+        <div className="flex justify-end">
+          <Button type="button" view="action" onClick={handleBack}>
             Back to home
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </Modal>
   )
 }

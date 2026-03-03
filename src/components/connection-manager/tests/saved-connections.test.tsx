@@ -31,7 +31,7 @@ describe('SavedConnections', () => {
       />
     )
 
-    expect(screen.getByText('No connections saved yet.')).toBeInTheDocument()
+    expect(screen.getByText('No connections saved yet')).toBeInTheDocument()
   })
 
   it('renders one card per connection', () => {

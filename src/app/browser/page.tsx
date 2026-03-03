@@ -1,13 +1,10 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from '@gravity-ui/icons'
+import { Button, Icon } from '@gravity-ui/uikit'
 import Link from 'next/link'
 
-import { Logo } from '@/components/brand/logo'
 import { AppShell } from '@/components/layout/app-shell'
 import { BrowserView } from '@/components/redis-browser'
 import { ConnectionLostDialog } from '@/components/redis-browser/connection-lost-dialog'
-import { ThemePresets } from '@/components/theme/theme-presets'
-import { ThemeToggle } from '@/components/theme/theme-toggle'
-import { Button } from '@/components/ui/button'
 import { getConnectionsState } from '@/lib/connections-store'
 
 const BrowserPage = async () => {
@@ -18,16 +15,12 @@ const BrowserPage = async () => {
 
   return (
     <AppShell>
-      <div className="space-y-6">
-        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
+      <div className="space-y-2">
+        <header className="flex flex-wrap items-center justify-between gap-4 pb-4">
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Logo className="size-5" />
-              <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Rediskai</span>
-            </div>
             <Link href="/connections">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="size-4" />
+              <Button view="outlined" size="m">
+                <Icon data={ArrowLeft} />
                 Back
               </Button>
             </Link>
@@ -43,10 +36,6 @@ const BrowserPage = async () => {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <ThemePresets />
-            <ThemeToggle />
-          </div>
         </header>
         {isStable ? (
           <BrowserView activeConnectionId={state.activeId} />
@@ -56,7 +45,7 @@ const BrowserPage = async () => {
             <p>Run a connection test from the home screen before opening the browser.</p>
             <div className="mt-4">
               <Link href="/">
-                <Button type="button" variant="outline">
+                <Button type="button" view="outlined">
                   Back to home
                 </Button>
               </Link>

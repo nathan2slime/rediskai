@@ -1,5 +1,6 @@
 'use client'
 
+import { ThemeProvider as GravityProvider } from '@gravity-ui/uikit'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import type { PropsWithChildren } from 'react'
 
@@ -10,8 +11,10 @@ import type { PropsWithChildren } from 'react'
  */
 export const ThemeProvider = ({ children }: PropsWithChildren) => {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="light" enableSystem>
-      {children}
-    </NextThemesProvider>
+    <GravityProvider theme="light">
+      <NextThemesProvider attribute="class" defaultTheme="light" enableSystem>
+        {children}
+      </NextThemesProvider>
+    </GravityProvider>
   )
 }

@@ -119,7 +119,7 @@ export const fetchKeyDetail = async (_prevState: RedisKeyDetailResult | null, fo
     const valueText = formatValue(value)
     const highlightedHtml = await codeToHtml(valueText, {
       lang: resolveLanguage(type),
-      theme: 'github-dark'
+      theme: 'github-light'
     })
 
     return { ok: true, key, type, ttl, value, valueText, highlightedHtml }
