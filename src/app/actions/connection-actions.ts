@@ -184,7 +184,7 @@ export const testConnection = async (_prevState: ActionResult, formData: FormDat
     await saveAndRevalidate(updated)
     return { ok: true, latencyMs }
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to connect'
+    const message = error instanceof Error ? error.message.replace('.', '') : 'Failed to connect'
     const updated = patchConnectionById(state, id, {
       lastTestedAt: new Date().toISOString(),
       lastTestStatus: 'error',

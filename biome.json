@@ -41,6 +41,7 @@
         "noDangerouslySetInnerHtml": "off"
       },
       "a11y": {
+        "useButtonType": "off",
         "noSvgWithoutTitle": "off",
         "useKeyWithClickEvents": "off",
         "noLabelWithoutControl": "off"

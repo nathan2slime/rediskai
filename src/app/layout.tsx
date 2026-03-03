@@ -3,7 +3,7 @@ import { Baloo_2 } from 'next/font/google'
 import type { PropsWithChildren } from 'react'
 
 import { ThemeProvider } from '@/components/theme/theme-provider'
-import { Toaster } from '@/components/ui/sonner'
+import { ToasterProvider } from '@/components/ui/toaster-provider'
 
 import '@/app/globals.css'
 
@@ -27,8 +27,7 @@ const RootLayout = ({ children }: PropsWithChildren) => {
     <html lang="en" suppressHydrationWarning>
       <body className={base.className}>
         <ThemeProvider>
-          {children}
-          <Toaster richColors closeButton />
+          <ToasterProvider>{children}</ToasterProvider>
         </ThemeProvider>
       </body>
     </html>

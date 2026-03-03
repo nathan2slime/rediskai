@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 
 import type { RedisKeyInfo, RedisScanResult } from '@/types/redis-browser'
 
@@ -21,6 +21,7 @@ export const useKeyListState = ({ activeConnectionId, scanState, scanAction }: U
   const [cursor, setCursor] = useState('0')
   const [mode, setMode] = useState<ScanMode>('search')
   const [items, setItems] = useState<RedisKeyInfo[]>([])
+  const [, startTransition] = useTransition()
 
   useEffect(() => {
     if (mode === 'search') {
@@ -42,18 +43,22 @@ export const useKeyListState = ({ activeConnectionId, scanState, scanAction }: U
       applyScanDefaults(formData, '0', pattern)
       setMode('search')
       setCursor('0')
-      scanAction(formData)
+      startTransition(() => {
+        scanAction(formData)
+      })
     },
-    [pattern, scanAction]
+    [pattern, scanAction, startTransition]
   )
 
   const handleLoadMore = useCallback(
     (formData: FormData) => {
       applyScanDefaults(formData, cursor, pattern)
       setMode('more')
-      scanAction(formData)
+      startTransition(() => {
+        scanAction(formData)
+      })
     },
-    [cursor, pattern, scanAction]
+    [cursor, pattern, scanAction, startTransition]
   )
 
   return {

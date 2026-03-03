@@ -1,5 +1,13 @@
 import { act, renderHook } from '@testing-library/react'
 
+vi.mock('react', async () => {
+  const actual = await vi.importActual<any>('react')
+  return {
+    ...actual,
+    useTransition: () => [false, (callback: () => void) => callback()]
+  }
+})
+
 import { useKeyDetailState } from '@/hooks/use-key-detail-state'
 import type { RedisKeyDetailResult, RedisKeyUpdateResult } from '@/types/redis-browser'
 

@@ -35,7 +35,7 @@ export const ConnectionCard = ({
 
   const dbOptions = useMemo(
     () =>
-      Array.from({ length: 16 }).map((_, index) => ({
+      Array.from({ length: 14 }).map((_, index) => ({
         value: String(index),
         content: `DB ${index}`
       })),

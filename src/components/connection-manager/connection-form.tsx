@@ -1,6 +1,6 @@
 'use client'
 
-import { FloppyDisk, Xmark } from '@gravity-ui/icons'
+import { ChevronLeft, FloppyDisk } from '@gravity-ui/icons'
 import { Button, Icon, TextInput } from '@gravity-ui/uikit'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useRef, useTransition } from 'react'
@@ -62,9 +62,9 @@ export const ConnectionForm = ({ addAction, closeAction, addPending, addState }:
   const isBusy = addPending || isSubmitting || isTransitionPending
 
   return (
-    <div className="space-y-4">
-      <form className="flex flex-col space-y-2 justify-between items-end" onSubmit={handleAdd}>
-        <div className="space-y-1">
+    <div className="space-y-4 w-full">
+      <form className="flex flex-col space-y-2 w-full justify-between items-end" onSubmit={handleAdd}>
+        <div className="space-y-1 w-full flex gap-2">
           <Controller
             control={control}
             name="name"
@@ -73,6 +73,7 @@ export const ConnectionForm = ({ addAction, closeAction, addPending, addState }:
 
               return (
                 <TextInput
+                  label="Name"
                   {...inputField}
                   placeholder="Connection name"
                   error={Boolean(errors.name?.message)}
@@ -92,6 +93,7 @@ export const ConnectionForm = ({ addAction, closeAction, addPending, addState }:
 
               return (
                 <TextInput
+                  label="URL"
                   {...inputField}
                   placeholder="redis://localhost:6379"
                   error={Boolean(errors.url?.message)}
@@ -107,8 +109,8 @@ export const ConnectionForm = ({ addAction, closeAction, addPending, addState }:
 
         <div className="w-full justify-end items-end gap-2 flex">
           <Button onClick={closeAction}>
-            <Icon data={Xmark} size={15} />
-            Cancel
+            <Icon data={ChevronLeft} size={15} />
+            Back
           </Button>
 
           <Button loading={isBusy} type="submit" view="action" size="m">
