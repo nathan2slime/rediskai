@@ -1,3 +1,4 @@
+import { describe, expect, it, rs } from '@rstest/core'
 import { act, renderHook } from '@testing-library/react'
 
 import { useConnectionCardState } from '@/hooks/use-connection-card-state'
@@ -49,7 +50,7 @@ describe('useConnectionCardState', () => {
     )
 
     const form = document.createElement('form')
-    const submitSpy = vi.spyOn(form, 'requestSubmit')
+    const submitSpy = rs.spyOn(form, 'requestSubmit')
 
     act(() => {
       result.current.dbFormRef.current = form

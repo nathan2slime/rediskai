@@ -37,7 +37,7 @@ export const BrowserView = ({ activeConnectionId }: BrowserViewProps) => {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
       <ConnectionLostDialog open={Boolean(connectionError)} description={connectionError ?? undefined} />
-      <Card className="min-w-0 p-3">
+      <Card className="min-w-0 h-fit p-3">
         <div className="space-y-1">
           <Text as="h3" variant="header-1">
             Keys

@@ -1,27 +1,29 @@
 # Rediskai
 
-Local Redis admin UI built with Next.js. Manage connections, browse keys, and inspect values locally.
+Local Redis admin UI built with Next.js for managing connections, browsing keys, and inspecting values without leaving your machine.
 
 ## Highlights
 
-- Multiple saved Redis connections
-- Active connection + DB index selection
-- Key browsing with SCAN, filters, and pagination
-- Key detail view with Shiki syntax highlighting
-- String edit + TTL update + key delete
+- Save, rename, remove, and test multiple Redis connections
+- Choose the active database before opening the browser
+- Browse keys with `SCAN`, pattern filters, and incremental loading
+- Inspect `string`, `hash`, `list`, `set`, `zset`, and `stream` values
+- Edit string values, update TTL, delete keys, and copy values quickly
+- Persist connection state locally in `data/connections.json`
 
 ## Tech stack
 
-- Next.js + React
+- Next.js 16 + React 19
 - Tailwind CSS v4
-- Shadcn UI components
+- Gravity UI + Radix primitives
 - ioredis
 - Shiki
-- Sonner (toasts)
+- Sonner
+- rstest
 
 ## Requirements
 
-- Node.js 20+ (tested in CI on 20, 21, 22)
+- Node.js 20+
 - pnpm 9+
 
 ## Getting started
@@ -31,7 +33,7 @@ pnpm install
 pnpm dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000`, add or test a connection on `/connections`, then open the Redis browser.
 
 ## Scripts
 
@@ -42,59 +44,68 @@ pnpm start
 pnpm lint
 pnpm format
 pnpm typecheck
+pnpm test
+pnpm test:watch
 ```
 
 ## Project structure
 
-```
+```text
 src/
-  app/               # Next.js routes and server actions
+  app/                    # Next.js routes and server actions
   components/
-    connection-manager/   # Connection UI
-    redis-browser/        # Keys browser + details
-    ui/                   # shadcn ui components
-    theme/                # Theme provider + toggle
-    layout/               # App shell
-  lib/               # Persistence helpers
-  types/             # Shared types by context
-  utils/             # Utilities (formatters, redis helpers)
+    connection-manager/   # Connection setup and management UI
+    layout/               # Shared app shell
+    redis-browser/        # Key listing, detail panel, and edit flows
+    theme/                # Theme provider and toggle
+    ui/                   # Shared UI helpers
+  hooks/                  # Client-side state hooks
+  lib/                    # Local persistence and helpers
+  tests/                  # Test setup
+  types/                  # Shared types
+  utils/                  # Redis and formatting utilities
 ```
 
 ## Data storage
 
-Connections are stored locally at:
+Connections are stored locally in:
 
-```
+```text
 data/connections.json
 ```
 
-## Formatting notes
+The file is created automatically on first use.
 
-- String values that contain JSON are formatted using `JSON.stringify(..., 2)` before highlighting.
-- Non-string keys remain read-only for now.
+## Notes
+
+- String values that contain valid JSON are prettified before syntax highlighting.
+- Non-string data types can be inspected today, but only string keys are editable.
+- The browser route requires a previously tested healthy connection.
 
 ## Roadmap
 
-### Functional (MVP)
+### Current board
 - [x] Connection management
+- [x] Connection test before browser access
 - [x] Active DB selection
-- [x] Key list with SCAN
-- [x] Key details + syntax highlight
-- [x] Edit string values + TTL
+- [x] Key list with `SCAN`, filters, and load more
+- [x] Key details with syntax highlighting
+- [x] Inspect `string`/`hash`/`list`/`set`/`zset`/`stream`
+- [x] Edit string values and TTL
 - [x] Delete keys
+- [x] Retry states for browser errors
 
 ### Next
-- [ ] Key editing for hash/list/set/zset/stream
-- [ ] Key detail actions (rename, duplicate, export)
+- [ ] Key editing for `hash`/`list`/`set`/`zset`/`stream`
+- [ ] Key detail actions (`rename`, `duplicate`, `export`)
 - [ ] Bulk operations (delete by pattern)
-- [ ] Search history + favorites
-- [ ] Database switch per connection (persisted)
-- [ ] Metrics: key size, memory usage
+- [ ] Search history and favorites
+- [ ] Persist selected DB per connection
+- [ ] Metrics (key size, memory usage)
 
 ### UX
 - [ ] Skeleton loading states
-- [ ] Better error surfaces + retry actions
-- [ ] Empty states for each data type
+- [ ] Empty states tailored by data type
 - [ ] Theme presets
 
 ## License

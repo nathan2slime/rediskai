@@ -1,10 +1,17 @@
+import { describe, expect, it, rs } from '@rstest/core'
 import { render, screen } from '@testing-library/react'
 
 import { SavedConnections } from '@/components/connection-manager/saved-connections'
 import type { ConnectionsState } from '@/types/connections'
 
-vi.mock('@/components/connection-manager/connection-card', () => ({
-  ConnectionCard: ({ connection }: { connection: { id: string } }) => <div data-testid="connection-card">{connection.id}</div>
+type ConnectionCardProps = {
+  connection: {
+    id: string
+  }
+}
+
+rs.mock('@/components/connection-manager/connection-card', () => ({
+  ConnectionCard: ({ connection }: ConnectionCardProps) => <div data-testid="connection-card">{connection.id}</div>
 }))
 
 const baseState: ConnectionsState = {

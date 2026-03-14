@@ -1,26 +1,30 @@
+import { describe, expect, it, rs } from '@rstest/core'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 import { KeyDetailEditModal } from '@/components/redis-browser/key-detail-edit-modal'
+import { ThemeProvider } from '@/components/theme/theme-provider'
 
 describe('KeyDetailEditModal', () => {
   it('submits form and triggers delete', async () => {
-    const onSubmit = vi.fn()
-    const onDelete = vi.fn()
+    const onSubmit = rs.fn()
+    const onDelete = rs.fn()
 
     render(
-      <KeyDetailEditModal
-        isOpen
-        onOpenChange={vi.fn()}
-        keyName="key:1"
-        draftValue="value"
-        draftTtl="10"
-        setDraftValue={vi.fn()}
-        setDraftTtl={vi.fn()}
-        onSubmit={onSubmit}
-        onDelete={onDelete}
-        deletePending={false}
-        updatePending={false}
-      />
+      <ThemeProvider>
+        <KeyDetailEditModal
+          isOpen
+          onOpenChange={rs.fn()}
+          keyName="key:1"
+          draftValue="value"
+          draftTtl="10"
+          setDraftValue={rs.fn()}
+          setDraftTtl={rs.fn()}
+          onSubmit={onSubmit}
+          onDelete={onDelete}
+          deletePending={false}
+          updatePending={false}
+        />
+      </ThemeProvider>
     )
 
     fireEvent.change(screen.getByPlaceholderText(/ttl/i), {

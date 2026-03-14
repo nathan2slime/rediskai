@@ -1,11 +1,12 @@
+import { beforeEach, describe, expect, it, rs } from '@rstest/core'
 import { act, renderHook } from '@testing-library/react'
 
 import { useThemeToggle } from '@/hooks/use-theme-toggle'
 
-const setTheme = vi.fn()
-const useThemeMock = vi.fn()
+const setTheme = rs.fn()
+const useThemeMock = rs.fn()
 
-vi.mock('next-themes', () => ({
+rs.mock('next-themes', () => ({
   useTheme: () => useThemeMock()
 }))
 

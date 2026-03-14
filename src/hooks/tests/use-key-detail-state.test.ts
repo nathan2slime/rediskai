@@ -1,12 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core'
 import { act, renderHook } from '@testing-library/react'
-
-vi.mock('react', async () => {
-  const actual = await vi.importActual<any>('react')
-  return {
-    ...actual,
-    useTransition: () => [false, (callback: () => void) => callback()]
-  }
-})
+import * as React from 'react'
 
 import { useKeyDetailState } from '@/hooks/use-key-detail-state'
 import type { RedisKeyDetailResult, RedisKeyUpdateResult } from '@/types/redis-browser'
@@ -27,8 +21,10 @@ const makeUpdate = (overrides?: Partial<RedisKeyUpdateResult>): RedisKeyUpdateRe
 })
 
 describe('useKeyDetailState', () => {
+  rs.spyOn(React, 'useTransition').mockImplementation(() => [false, (callback: () => void) => callback()])
+
   it('fetches detail when selected key changes', () => {
-    const detailAction = vi.fn()
+    const detailAction = rs.fn()
     renderHook(() =>
       useKeyDetailState({
         selectedKey: 'user:1',
@@ -36,8 +32,8 @@ describe('useKeyDetailState', () => {
         updateState: makeUpdate(),
         deleteState: makeUpdate(),
         detailAction,
-        deleteAction: vi.fn(),
-        notify: { success: vi.fn(), error: vi.fn() }
+        deleteAction: rs.fn(),
+        notify: { success: rs.fn(), error: rs.fn() }
       })
     )
 
@@ -47,16 +43,16 @@ describe('useKeyDetailState', () => {
   })
 
   it('hydrates drafts from detail and handles delete action', () => {
-    const deleteAction = vi.fn()
+    const deleteAction = rs.fn()
     const { result } = renderHook(() =>
       useKeyDetailState({
         selectedKey: 'user:1',
         detail: makeDetail({ valueText: 'hello', ttl: 30 }),
         updateState: makeUpdate(),
         deleteState: makeUpdate(),
-        detailAction: vi.fn(),
+        detailAction: rs.fn(),
         deleteAction,
-        notify: { success: vi.fn(), error: vi.fn() }
+        notify: { success: rs.fn(), error: rs.fn() }
       })
     )
 
@@ -73,18 +69,18 @@ describe('useKeyDetailState', () => {
   })
 
   it('copies value and resets copied flag after timeout', async () => {
-    vi.useFakeTimers()
+    rs.useFakeTimers()
 
-    const copyToClipboard = vi.fn().mockResolvedValue(undefined)
+    const copyToClipboard = rs.fn().mockResolvedValue(undefined)
     const { result } = renderHook(() =>
       useKeyDetailState({
         selectedKey: 'user:1',
         detail: makeDetail({ valueText: 'content' }),
         updateState: makeUpdate(),
         deleteState: makeUpdate(),
-        detailAction: vi.fn(),
-        deleteAction: vi.fn(),
-        notify: { success: vi.fn(), error: vi.fn() },
+        detailAction: rs.fn(),
+        deleteAction: rs.fn(),
+        notify: { success: rs.fn(), error: rs.fn() },
         copyToClipboard
       })
     )
@@ -97,16 +93,16 @@ describe('useKeyDetailState', () => {
     expect(result.current.copied).toBe(true)
 
     act(() => {
-      vi.advanceTimersByTime(1500)
+      rs.advanceTimersByTime(1500)
     })
 
     expect(result.current.copied).toBe(false)
-    vi.useRealTimers()
+    rs.useRealTimers()
   })
 
   it('emits notifications for update/delete results', () => {
-    const success = vi.fn()
-    const error = vi.fn()
+    const success = rs.fn()
+    const error = rs.fn()
 
     renderHook(() =>
       useKeyDetailState({
@@ -114,8 +110,8 @@ describe('useKeyDetailState', () => {
         detail: makeDetail(),
         updateState: makeUpdate({ ok: false, error: 'Update failed', key: 'user:1' }),
         deleteState: makeUpdate({ ok: true, key: 'user:1' }),
-        detailAction: vi.fn(),
-        deleteAction: vi.fn(),
+        detailAction: rs.fn(),
+        deleteAction: rs.fn(),
         notify: { success, error }
       })
     )
@@ -125,7 +121,7 @@ describe('useKeyDetailState', () => {
   })
 
   it('retries only when there is a selected key', () => {
-    const detailAction = vi.fn()
+    const detailAction = rs.fn()
     const { result, rerender } = renderHook(
       ({ selectedKey }) =>
         useKeyDetailState({
@@ -134,8 +130,8 @@ describe('useKeyDetailState', () => {
           updateState: makeUpdate(),
           deleteState: makeUpdate(),
           detailAction,
-          deleteAction: vi.fn(),
-          notify: { success: vi.fn(), error: vi.fn() }
+          deleteAction: rs.fn(),
+          notify: { success: rs.fn(), error: rs.fn() }
         }),
       {
         initialProps: {

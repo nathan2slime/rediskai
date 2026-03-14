@@ -1,9 +1,14 @@
+import { describe, expect, it, rs } from '@rstest/core'
 import { fireEvent, render, screen } from '@testing-library/react'
 
 import { ConnectionCard } from '@/components/connection-manager/connection-card'
 
-vi.mock('@/components/connection-manager/connection-settings-modal', () => ({
-  ConnectionSettingsModal: ({ isOpen }: { isOpen: boolean }) => <div data-testid="settings-modal" data-open={String(isOpen)} />
+type ConnectionSettingsModalProps = {
+  isOpen: boolean
+}
+
+rs.mock('@/components/connection-manager/connection-settings-modal', () => ({
+  ConnectionSettingsModal: ({ isOpen }: ConnectionSettingsModalProps) => <div data-testid="settings-modal" data-open={String(isOpen)} />
 }))
 
 describe('ConnectionCard', () => {
@@ -24,12 +29,12 @@ describe('ConnectionCard', () => {
         connection={connection}
         isActive
         testPending={false}
-        setActiveAction={vi.fn()}
-        setDatabaseAction={vi.fn()}
-        renameAction={vi.fn()}
-        testAction={vi.fn()}
-        deleteAction={vi.fn()}
-        openBrowserAction={vi.fn()}
+        setActiveAction={rs.fn()}
+        setDatabaseAction={rs.fn()}
+        renameAction={rs.fn()}
+        testAction={rs.fn()}
+        deleteAction={rs.fn()}
+        openBrowserAction={rs.fn()}
         activeDb={0}
       />
     )
