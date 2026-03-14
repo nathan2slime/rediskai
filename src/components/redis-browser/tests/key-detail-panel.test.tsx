@@ -1,41 +1,36 @@
+import { beforeEach, describe, expect, it, rs } from '@rstest/core'
 import { render, screen } from '@testing-library/react'
+import * as React from 'react'
 
 import { KeyDetailPanel } from '@/components/redis-browser/key-detail-panel'
 
-const useActionStateMock = vi.fn()
+const useActionStateMock = rs.fn()
 
-vi.mock('react', async () => {
-  const actual = await vi.importActual<any>('react')
-  return {
-    ...actual,
-    useActionState: (...args: any[]) => useActionStateMock(...args)
-  }
-})
-
-vi.mock('@/hooks/use-key-detail-state', () => ({
+rs.mock('@/hooks/use-key-detail-state', () => ({
   useKeyDetailState: () => ({
     copied: false,
     draftValue: '',
     draftTtl: '',
     canEditString: false,
-    setDraftValue: vi.fn(),
-    setDraftTtl: vi.fn(),
-    handleCopy: vi.fn(),
-    handleDelete: vi.fn(),
-    handleRetry: vi.fn()
+    setDraftValue: rs.fn(),
+    setDraftTtl: rs.fn(),
+    handleCopy: rs.fn(),
+    handleDelete: rs.fn(),
+    handleRetry: rs.fn()
   })
 }))
 
 describe('KeyDetailPanel', () => {
   beforeEach(() => {
     useActionStateMock.mockReset()
+    rs.spyOn(React, 'useActionState').mockImplementation((...args: any[]) => useActionStateMock(...args))
   })
 
   it('shows empty state when no key selected', () => {
     useActionStateMock
-      .mockReturnValueOnce([{ ok: false, key: '', error: 'Select a key' }, vi.fn(), false])
-      .mockReturnValueOnce([{ ok: true, key: '' }, vi.fn(), false])
-      .mockReturnValueOnce([{ ok: true, key: '' }, vi.fn(), false])
+      .mockReturnValueOnce([{ ok: false, key: '', error: 'Select a key' }, rs.fn(), false])
+      .mockReturnValueOnce([{ ok: true, key: '' }, rs.fn(), false])
+      .mockReturnValueOnce([{ ok: true, key: '' }, rs.fn(), false])
 
     render(<KeyDetailPanel selectedKey={null} />)
 
@@ -44,9 +39,9 @@ describe('KeyDetailPanel', () => {
 
   it('shows error state when detail fails', () => {
     useActionStateMock
-      .mockReturnValueOnce([{ ok: false, key: '', error: 'Failed to load' }, vi.fn(), false])
-      .mockReturnValueOnce([{ ok: true, key: '' }, vi.fn(), false])
-      .mockReturnValueOnce([{ ok: true, key: '' }, vi.fn(), false])
+      .mockReturnValueOnce([{ ok: false, key: '', error: 'Failed to load' }, rs.fn(), false])
+      .mockReturnValueOnce([{ ok: true, key: '' }, rs.fn(), false])
+      .mockReturnValueOnce([{ ok: true, key: '' }, rs.fn(), false])
 
     render(<KeyDetailPanel selectedKey="key:1" />)
 

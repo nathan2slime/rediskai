@@ -1,3 +1,4 @@
+import { describe, expect, it, rs } from '@rstest/core'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 import { ConnectionForm } from '@/components/connection-manager/connection-form'
@@ -7,8 +8,8 @@ const okState: ActionResult = { ok: true }
 
 describe('ConnectionForm', () => {
   it('submits valid data and calls actions', async () => {
-    const addAction = vi.fn()
-    const closeAction = vi.fn()
+    const addAction = rs.fn()
+    const closeAction = rs.fn()
 
     render(<ConnectionForm addAction={addAction} addPending={false} addState={okState} closeAction={closeAction} />)
 
@@ -28,8 +29,8 @@ describe('ConnectionForm', () => {
   })
 
   it('does not submit when required fields are missing', () => {
-    const addAction = vi.fn()
-    const closeAction = vi.fn()
+    const addAction = rs.fn()
+    const closeAction = rs.fn()
 
     render(<ConnectionForm addAction={addAction} addPending={false} addState={okState} closeAction={closeAction} />)
 

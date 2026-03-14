@@ -1,6 +1,6 @@
 'use client'
 
-import { Pencil, TrashBin, Xmark } from '@gravity-ui/icons'
+import { FloppyDisk, TrashBin, Xmark } from '@gravity-ui/icons'
 import { Button, Divider, Icon, Modal, Text, TextInput } from '@gravity-ui/uikit'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useTransition } from 'react'
@@ -77,7 +77,7 @@ export const KeyDetailEditModal = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3">
           <Text as="p" variant="body-3">
-            Edit value
+            Edit
           </Text>
           <Button type="button" view="flat" size="s" onClick={() => onOpenChange(false)}>
             <Icon data={Xmark} size={14} />
@@ -131,7 +131,7 @@ export const KeyDetailEditModal = ({
             {deletePending ? 'Deleting...' : 'Delete'}
           </Button>
           <Button type="submit" view="action" form="key-detail-edit-form" disabled={!isValid} loading={updatePending || isTransitionPending}>
-            <Icon data={Pencil} size={15} />
+            <Icon data={FloppyDisk} size={15} />
             {updatePending ? 'Saving...' : 'Save'}
           </Button>
         </div>

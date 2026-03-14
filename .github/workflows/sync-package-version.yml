@@ -1,0 +1,44 @@
+name: Sync Package Version
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  sync-package-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Update package.json version from release tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          npm pkg set version="$VERSION"
+
+      - name: Commit version update
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if git diff --quiet -- package.json; then
+            echo "package.json already matches release version"
+            exit 0
+          fi
+
+          VERSION="${RELEASE_TAG#v}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: sync package version to $VERSION"
+          git push origin "${{ github.event.release.target_commitish }}"

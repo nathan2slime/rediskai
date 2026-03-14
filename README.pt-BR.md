@@ -1,27 +1,29 @@
 # Rediskai
 
-UI local para administrar Redis com Next.js. Gerencie conexões, navegue por chaves e visualize valores localmente.
+UI local para administrar Redis com Next.js, gerenciar conexões, navegar por chaves e inspecionar valores sem sair da sua máquina.
 
 ## Destaques
 
-- Múltiplas conexões Redis salvas
-- Conexão ativa + seleção de DB
-- Lista de chaves via SCAN com filtro e paginação
-- Detalhes com highlight usando Shiki
-- Edição de string + TTL + delete
+- Salva, renomeia, remove e testa múltiplas conexões Redis
+- Permite escolher o banco ativo antes de abrir o browser
+- Navega por chaves com `SCAN`, filtro por pattern e carregamento incremental
+- Inspeciona valores `string`, `hash`, `list`, `set`, `zset` e `stream`
+- Edita strings, atualiza TTL, remove chaves e copia valores rapidamente
+- Persiste o estado localmente em `data/connections.json`
 
 ## Stack
 
-- Next.js + React
+- Next.js 16 + React 19
 - Tailwind CSS v4
-- Shadcn UI
+- Gravity UI + primitivas Radix
 - ioredis
 - Shiki
-- Sonner (toasts)
+- Sonner
+- rstest
 
 ## Requisitos
 
-- Node.js 20+ (testado no CI em 20, 21, 22)
+- Node.js 20+
 - pnpm 9+
 
 ## Como rodar
@@ -31,7 +33,7 @@ pnpm install
 pnpm dev
 ```
 
-Abra `http://localhost:3000`.
+Abra `http://localhost:3000`, configure ou teste uma conexão em `/connections` e depois abra o browser Redis.
 
 ## Scripts
 
@@ -42,58 +44,67 @@ pnpm start
 pnpm lint
 pnpm format
 pnpm typecheck
+pnpm test
+pnpm test:watch
 ```
 
 ## Organização de arquivos
 
-```
+```text
 src/
-  app/               # Rotas e server actions
+  app/                    # Rotas e server actions
   components/
-    connection-manager/   # UI de conexões
-    redis-browser/        # Navegador de chaves + detalhes
-    ui/                   # Componentes shadcn
-    theme/                # Theme provider + toggle
-    layout/               # App shell
-  lib/               # Persistência local
-  types/             # Tipos por contexto
-  utils/             # Utilitários (formatters, redis helpers)
+    connection-manager/   # UI de configuração e gestão de conexões
+    layout/               # App shell compartilhado
+    redis-browser/        # Lista de chaves, detalhe e edição
+    theme/                # Theme provider e toggle
+    ui/                   # Helpers de UI
+  hooks/                  # Hooks de estado no client
+  lib/                    # Persistência local e helpers
+  tests/                  # Setup de testes
+  types/                  # Tipos compartilhados
+  utils/                  # Utilitários de Redis e formatação
 ```
 
 ## Armazenamento
 
 As conexões são salvas localmente em:
 
-```
+```text
 data/connections.json
 ```
 
-## Formatação
+O arquivo é criado automaticamente no primeiro uso.
 
-- Strings que são JSON válidos são formatadas com `JSON.stringify(..., 2)`.
-- Tipos não-string seguem somente leitura por enquanto.
+## Observações
+
+- Strings que contêm JSON válido são formatadas antes do syntax highlight.
+- Tipos não-string já podem ser inspecionados, mas somente chaves `string` podem ser editadas.
+- A rota do browser exige uma conexão previamente testada com sucesso.
 
 ## Roadmap
 
-### Funcional (MVP)
-- [x] Gerenciar conexões
-- [x] Selecionar DB ativo
-- [x] Lista de chaves via SCAN
-- [x] Detalhes + highlight
-- [x] Edição de string + TTL
+### Board atual
+- [x] Gerenciamento de conexões
+- [x] Teste de conexão antes de abrir o browser
+- [x] Seleção de DB ativo
+- [x] Lista de chaves com `SCAN`, filtros e carregar mais
+- [x] Detalhes com syntax highlight
+- [x] Inspeção de `string`/`hash`/`list`/`set`/`zset`/`stream`
+- [x] Edição de string e TTL
 - [x] Delete de chave
+- [x] Estados de retry para erros no browser
 
 ### Próximos passos
-- [ ] Edição de hash/list/set/zset/stream
-- [ ] Ações no detalhe (renomear, duplicar, exportar)
+- [ ] Edição de `hash`/`list`/`set`/`zset`/`stream`
+- [ ] Ações no detalhe (`rename`, `duplicate`, `export`)
 - [ ] Operações em massa (delete por pattern)
-- [ ] Histórico de busca + favoritos
-- [ ] Persistir DB por conexão
-- [ ] Métricas: tamanho da chave, uso de memória
+- [ ] Histórico de busca e favoritos
+- [ ] Persistir DB selecionado por conexão
+- [ ] Métricas (tamanho da chave, uso de memória)
 
 ### UX
 - [ ] Skeletons de loading
-- [ ] Erros com retry
 - [ ] Empty states por tipo
 - [ ] Presets de tema
 

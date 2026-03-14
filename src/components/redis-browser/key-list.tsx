@@ -125,7 +125,7 @@ export const KeyList = ({ activeConnectionId, onSelect, selectedKey, onConnectio
               </Text>
             </div>
           ) : (
-            <ul className="divide-y">
+            <ul>
               {items.map(item => (
                 <li key={item.key} className={cn('grid grid-cols-[1fr_120px_80px_40px] gap-2 px-4 py-2 text-sm', selectedKey === item.key ? 'bg-muted/40' : 'bg-transparent')}>
                   <Text as="span" variant="body-2" ellipsis>

@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@rstest/core'
 import { act, renderHook } from '@testing-library/react'
 
 import { useBrowserSelection } from '@/hooks/use-browser-selection'

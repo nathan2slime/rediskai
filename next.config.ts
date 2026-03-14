@@ -1,16 +1,16 @@
 import { NextConfig } from 'next'
+import withRspack from 'next-rspack'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  turbopack: {
-    rules: {
-      '*.svg': {
-        as: '*.js',
-        loaders: ['@svgr/webpack']
-      }
-    }
+  webpack: config => {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack']
+    })
+    return config
   }
 }
 
-export default nextConfig
+export default withRspack(nextConfig)

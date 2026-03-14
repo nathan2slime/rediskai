@@ -1,16 +1,28 @@
+import { describe, expect, it, rs } from '@rstest/core'
 import { fireEvent, render, screen } from '@testing-library/react'
 
 import { BrowserView } from '@/components/redis-browser/browser-view'
 
-vi.mock('next/navigation', () => ({
+type KeyListProps = {
+  onSelect: (key: string) => void
+  selectedKey: string | null
+  onConnectionLost?: (message: string) => void
+}
+
+type KeyDetailPanelProps = {
+  selectedKey: string | null
+  onConnectionLost?: (message: string) => void
+}
+
+rs.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: vi.fn(),
-    refresh: vi.fn()
+    push: rs.fn(),
+    refresh: rs.fn()
   })
 }))
 
-vi.mock('@/components/redis-browser/key-list', () => ({
-  KeyList: ({ onSelect, selectedKey }: { onSelect: (key: string) => void; selectedKey: string | null; onConnectionLost?: (message: string) => void }) => (
+rs.mock('@/components/redis-browser/key-list', () => ({
+  KeyList: ({ onSelect, selectedKey }: KeyListProps) => (
     <div>
       <button onClick={() => onSelect('key:1')} type="button">
         select key
@@ -20,10 +32,8 @@ vi.mock('@/components/redis-browser/key-list', () => ({
   )
 }))
 
-vi.mock('@/components/redis-browser/key-detail-panel', () => ({
-  KeyDetailPanel: ({ selectedKey }: { selectedKey: string | null; onConnectionLost?: (message: string) => void }) => (
-    <p data-testid="selected-key-detail">{selectedKey ?? 'none'}</p>
-  )
+rs.mock('@/components/redis-browser/key-detail-panel', () => ({
+  KeyDetailPanel: ({ selectedKey }: KeyDetailPanelProps) => <p data-testid="selected-key-detail">{selectedKey ?? 'none'}</p>
 }))
 
 describe('BrowserView', () => {
